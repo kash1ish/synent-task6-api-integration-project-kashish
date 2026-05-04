@@ -1,0 +1,16 @@
+body{
+    background-color: black;
+    color: white;
+}
+
+#user-info div{
+    margin: 20px;
+    width: 250px;
+    height: 200px;
+    padding: 10px;
+    border: 1px solid white;
+}
+
+#user-info img{
+    width: 50px;
+}
