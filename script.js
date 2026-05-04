@@ -1,37 +1,50 @@
-async function searchUser(){
-    const username = document.getElementById("username").value;
-    console.log(username);
+const input = document.getElementById("username");
+const container = document.getElementById("user-info");
 
-    try{
-        const response = await fetch(`https://api.github.com/users/${username}`);
-        if(!response.ok) throw new Error("User not found");
-        const data = await response.json();
-    }catch(error){
-        document.getElementById("user-info").innerHTML = `<p>${error.message}`;
+input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        searchUser();
+    }
+});
+
+async function searchUser() {
+    const username = input.value.trim();
+
+    if (!username) {
+        alert("Please enter a username");
+        return;
     }
 
-    const container = document.getElementById("user-info");
-    container.innerHTML = " ";
+    container.innerHTML = "<p>Loading...</p>";
 
-    const card = document.createElement("div");
-    const img = document.createElement("img");
-    const name = document.createElement("h2");
-    const repos = document.createElement("p");
-    const followers = document.createElement("p");
-    const following = document.createElement("p");
+    try {
+        const response = await fetch(`https://api.github.com/users/${username}`);
 
-    img.src = data.avatar_url;
-    name.innerText = "Username: " + data.login;
-    repos.innerText = "Public Repositories: " + data.public_repos;
-    followers.innerText = "Followers: " + data.followers;
-    following.innerText = "Following: " + data.following;
+        if (!response.ok) {
+            throw new Error("User not found");
+        }
 
-    card.appendChild(img);
-    card.appendChild(name);
-    card.appendChild(repos);
-    card.appendChild(followers);
-    card.appendChild(following);
+        const data = await response.json();
 
-    container.appendChild(card);
+        container.innerHTML = "";
+
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        card.innerHTML = `
+            <img src="${data.avatar_url}" alt="avatar">
+            <h2>${data.login}</h2>
+            <p>${data.bio || "No bio available"}</p>
+            <p>${data.location || "No location"}</p>
+            <p>Repos: ${data.public_repos}</p>
+            <p>Followers: ${data.followers}</p>
+            <p>Following: ${data.following}</p>
+            <a href="${data.html_url}" target="_blank">View Profile</a>
+        `;
+
+        container.appendChild(card);
+
+    } catch (error) {
+        container.innerHTML = `<p>${error.message}</p>`;
+    }
 }
-
